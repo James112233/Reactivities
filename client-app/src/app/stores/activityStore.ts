@@ -18,7 +18,7 @@ class ActivityStore {
     }
 
     @computed get activitiesByDate() {
-        console.log('act: ', this.groupActivitiesByDate(Array.from(this.activityRegistry.values())));
+        // console.log('act: ', this.groupActivitiesByDate(Array.from(this.activityRegistry.values())));
         return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()))
         // return Array.from(this.activityRegistry.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
     }
@@ -47,7 +47,6 @@ class ActivityStore {
                 });
                 this.loadingInitial = false;
             })
-
         } catch (error) {
             runInAction(() => {
                 this.loadingInitial = false;

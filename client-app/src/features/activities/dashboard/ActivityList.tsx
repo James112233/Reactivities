@@ -1,5 +1,5 @@
 import React, { Fragment, useContext } from "react";
-import { Item, Label, Segment } from "semantic-ui-react";
+import { Item, Label } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import ActivityStore from "../../../app/stores/activityStore";
 import { ActivityListItem } from "./ActivityListItem";
@@ -10,7 +10,7 @@ const ActivityList: React.FC = () => {
   return (
     <Fragment>
       {activitiesByDate.map(([group, activities]) => (
-        <Fragment>
+        <Fragment key={group}>
           <Label key={group} size="large" color="blue">
             {group}
           </Label>
