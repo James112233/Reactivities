@@ -1,13 +1,16 @@
-import { action, observable, computed, configure, runInAction, makeObservable } from "mobx";
-import { createContext, SyntheticEvent } from "react";
+import { action, observable, computed, runInAction, makeObservable } from "mobx";
+import { SyntheticEvent } from "react";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import agent from "../api/agent";
 import { IActivity } from "../models/activity";
+import { RootStore } from "./rootStore";
 
-configure({ enforceActions: "always" });
 
-class ActivityStore {
+
+export default class ActivityStore {
+    rootStore: RootStore;
+
     @observable activityRegistry = new Map();
     @observable activities: IActivity[] = [];
     @observable activity: IActivity | null = null;
@@ -15,8 +18,9 @@ class ActivityStore {
     @observable submitting = false;
     @observable target = '';
 
-    constructor() {
-        makeObservable(this)
+    constructor(rootStore: RootStore) {
+        makeObservable(this);
+        this.rootStore = rootStore;
     }
 
     @computed get activitiesByDate() {
@@ -153,5 +157,3 @@ class ActivityStore {
         this.activity = this.activityRegistry.get(id);
     };
 }
-
-export default createContext(new ActivityStore())
