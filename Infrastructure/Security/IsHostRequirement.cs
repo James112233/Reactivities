@@ -11,7 +11,6 @@ namespace Infrastructure.Security
 {
     public class IsHostRequirement : IAuthorizationRequirement
     {
-
     }
 
     public class IsHostRequirementHandler : AuthorizationHandler<IsHostRequirement>
