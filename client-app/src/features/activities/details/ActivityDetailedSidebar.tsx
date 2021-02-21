@@ -8,7 +8,7 @@ interface IProps {
   attendees: IAttendee[];
 }
 
- const ActivityDetailedSidebar: React.FC<IProps> = ({ attendees }) => {
+const ActivityDetailedSidebar: React.FC<IProps> = ({ attendees }) => {
   return (
     <Fragment>
       <Segment
@@ -41,7 +41,9 @@ interface IProps {
                     {attendee.displayname}
                   </Link>
                 </Item.Header>
-                <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                {attendee.following && (
+                  <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                )}
               </Item.Content>
             </Item>
           ))}
