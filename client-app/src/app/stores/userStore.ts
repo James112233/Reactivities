@@ -1,3 +1,4 @@
+import { tr } from "date-fns/locale";
 import { action, computed, makeObservable, observable, runInAction } from "mobx";
 import { history } from "../..";
 import agent from "../api/agent";
@@ -9,6 +10,7 @@ export default class UserStore {
     rootStore: RootStore;
 
     @observable user: IUser | null = null;
+    @observable loading = false;
 
     constructor(rootStore: RootStore) {
         makeObservable(this);
@@ -59,5 +61,27 @@ export default class UserStore {
         this.rootStore.commonStore.setToken(null);
         this.user = null;
         history.push('/')
+    }
+
+    @action fbLogin = async (response: any) => {
+        // console.log("RES",response);
+        this.loading = true;
+        try {
+            const user = await agent.User.fbLogin(response.accessToken);
+            console.log("user: ", user);
+            console.log(response);
+
+            runInAction(() => {
+                this.user = user;
+                this.rootStore.commonStore.setToken(user.token);
+                this.rootStore.modalStore.closeModal();
+                this.loading = false; 
+            });
+
+            history.push('/activities');
+        } catch (error) {
+            console.log("ERR: ", error);
+
+        }
     }
 }
