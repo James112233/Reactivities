@@ -23,6 +23,7 @@ using Infrastructure.Photos;
 using System.Threading.Tasks;
 using API.SignalR;
 using Application.Profiles;
+using System;
 
 namespace API
 {
@@ -36,18 +37,39 @@ namespace API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseLazyLoadingProxies();
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            ConfigureServices(services);
+        }
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            services.AddDbContext<DataContext>(opt =>
+            {
+                opt.UseLazyLoadingProxies();
+                opt.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            ConfigureServices(services);
+        }
+        public void ConfigureServices(IServiceCollection services)
+        {
+
             services.AddCors(opt =>
             {
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000").AllowCredentials();
+                    policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithExposedHeaders("WWW-Authenticate")
+                        .WithOrigins("http://localhost:3000")
+                        .AllowCredentials();
                 });
             });
             services.AddMediatR(typeof(List.Handler).Assembly);
@@ -87,7 +109,9 @@ namespace API
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = key,
                         ValidateAudience = false,
-                        ValidateIssuer = false
+                        ValidateIssuer = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                     opt.Events = new JwtBearerEvents
                     {
@@ -103,11 +127,18 @@ namespace API
                         }
                     };
                 });
+            services.AddHttpClient("facebook", config =>
+            {
+                config.BaseAddress = new Uri("https://graph.facebook.com/");
+                config.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.AddScoped<IProfileReader, ProfileReader>();
+            services.AddScoped<IFacebookAccessor, FacebookAccessor>();
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
+            services.Configure<FacebookAppSettings>(Configuration.GetSection("Authentication:Facebook"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -120,6 +151,8 @@ namespace API
             }
 
             // app.UseHttpsRedirection();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseRouting();
             app.UseCors("CorsPolicy");
@@ -132,6 +165,7 @@ namespace API
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }
