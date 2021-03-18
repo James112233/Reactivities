@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +53,8 @@ namespace Application.User
                     DisplayName = userInfo.Name,
                     Id = userInfo.Id,
                     Email = userInfo.Email,
-                    UserName = "fb_" + userInfo.Id
+                    UserName = "fb_" + userInfo.Id,
+                    EmailConfirmed = true
                 };
 
                 var photo = new Photo
