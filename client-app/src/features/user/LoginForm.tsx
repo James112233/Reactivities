@@ -30,13 +30,12 @@ const LoginForm = () => {
       render={({
         handleSubmit,
         submitting,
-        form,
         submitError,
         invalid,
         pristine,
         dirtySinceLastSubmit,
       }) => (
-        <Form onSubmit={handleSubmit} error>
+        <Form onSubmit={handleSubmit} error autoComplete='off'>
           <Header
             as="h2"
             content="Login to Reactivities"

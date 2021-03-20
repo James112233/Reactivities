@@ -10,8 +10,8 @@ import { RootStoreContext } from "../../app/stores/rootStore";
 
 const validate = combineValidators({
   username: isRequired("username"),
-  displayName: isRequired("display Name"),
-  email: isRequired("display name"),
+  displayname: isRequired("displayname"),
+  email: isRequired("email"),
   password: isRequired("password"),
 });
 
@@ -30,7 +30,6 @@ const RegisterForm = () => {
       render={({
         handleSubmit,
         submitting,
-        form,
         submitError,
         invalid,
         pristine,
